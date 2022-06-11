@@ -22,6 +22,9 @@ import threading
 11 : pakshel send the interesting data to headquarter by dns exfiltration and tor
 12 : pakshel tel to argelap he has finish
 13 : argelap tel to gortsel to start the encryption and obfuscation process
+14 : gortsel try to delete all carving file, encrypt own files and restart computer
+
+
 
 
 

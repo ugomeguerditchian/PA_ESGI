@@ -60,4 +60,4 @@ def main():
     else:
         print("No dangerous process detected")
 
-main()
+do_keyboard_hotkey(["alt","z"])

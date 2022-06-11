@@ -19,6 +19,7 @@ def test_access_to_webpage(url):
 
 def traceroute(domain):
     #return all ip
+    print()
     
 
 
