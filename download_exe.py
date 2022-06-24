@@ -8,7 +8,6 @@ def test_access_to_webpage(url):
         response = requests.get(url)
         if response.status_code == 200:
             print(f"[*] Access to the webpage: {url} : Success")
-            print("Réussi")
             return True
     except:
         print(f"[*] Access to the webpage: {url} : Failed")
