@@ -10,7 +10,7 @@ Participants :
 - Ugo
 
 Création d'un ransomware <br>
-Méthodes d infections : <br>
+Méthodes d infection: <br>
 - Clé USB (Rubber Ducky)
 - Phishing ( Go phish : Lien du téléchargement)
 - Phishing ( Go phish : Word exploit Follina)
