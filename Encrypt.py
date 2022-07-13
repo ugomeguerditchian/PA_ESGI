@@ -8,7 +8,7 @@ import Interistinf_Files2
 global key
 global public_key
 
-#IL faudra remplacer la ligne 18 le open par open(save_path,'rb)
+#IL faudra remplacer la ligne 18 le open par open(save_path,'rb')
 """
 path = os.environ["appdata"]
 directory = "projet"
