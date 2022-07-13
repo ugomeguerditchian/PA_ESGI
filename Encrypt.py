@@ -10,9 +10,7 @@ global public_key
 
 #IL faudra remplacer la ligne 66 le open par open(save_path,'rb')
 """
-path = os.environ["appdata"]
-directory = "projet"
-save_path = os.path.join(path, directory)
+path = os.environ["appdata"] + "\\projet\\public.key"
 """
 
 
