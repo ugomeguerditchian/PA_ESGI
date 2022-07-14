@@ -5,7 +5,7 @@ from threading import Thread
 # Dictionary
 import docx
 
-extensions = [".txt", ".png", ".docx", ".pdf"]
+extensions = [".txt", ".png", ".docx", ".pdf",]
 bank_data = ["BIC", "Identité", "Bancaire", "toto", "Exemple", "fichier"]
 
 
@@ -49,7 +49,7 @@ def sort_by_priority(tmp_list):
 def search_interisting_files(files_list):
     tmp_list = []
     for file in files_list:
-        print(file)
+        #print(file)
         if file.endswith('.pdf'):
             tmp_list.append(pdf_parser(file))
         elif file.endswith('.txt'):
@@ -127,8 +127,9 @@ def txt_parser(file):
 
 
 def main():
-    files_list = search_interisting_files(file_collection('testdir'))
-    #print(files_list)
+    location = os.environ["USERPROFILE"] + "\Desktop\\testdir"
+    files_list = search_interisting_files(file_collection(location))
+    print(files_list)
     return files_list
 
 """"
