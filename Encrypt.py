@@ -6,12 +6,9 @@ import Interistinf_Files2
 
 #Génération des clefs privé / public
 global key
-global public_key
+
 
 #IL faudra remplacer la ligne 66 le open par open(path,'rb')
-"""
-path = os.environ["appdata"] + "\\projet\\public.key"
-"""
 
 
 def rsa_encrypt(data_to_encrypt):
@@ -60,10 +57,12 @@ def encrypt():
     return True
 
 def main():
+    path = os.environ["appdata"] + "\\projet\\public.key"
+    #path = "encrypt/public.key"
     global public_key
-    content_file = open("encrypt/public.key", 'rb')
+    content_file = open(path, 'rb')
     public_key = content_file.read()
     content_file.close
     encrypt()
 
-main()
+#main()
